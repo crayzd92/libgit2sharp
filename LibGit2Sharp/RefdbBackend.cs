@@ -7,6 +7,27 @@ using LibGit2Sharp.Core.Handles;
 namespace LibGit2Sharp
 {
     /// <summary>
+    /// Unlock type
+    /// </summary>
+    public enum RefdbBackendUnlockType
+    {
+        /// <summary>
+        /// Unforced
+        /// </summary>
+        Unforced = 0,
+
+        /// <summary>
+        /// Forced
+        /// </summary>
+        Forced = 1,
+
+        /// <summary>
+        /// Reference is to be deleted
+        /// </summary>
+        UnlockAndDelete = 2
+    }
+
+    /// <summary>
     ///   Base class for all custom managed backends for the libgit2 reference database.
     /// </summary>
     public abstract class RefdbBackend
@@ -139,7 +160,6 @@ namespace LibGit2Sharp
         /// <param name="refname"></param>
         /// <returns></returns>
         public abstract void UnlockReference(string refname);
-
         private IntPtr nativeBackendPointer;
 
         internal IntPtr GitRefdbBackendPointer
@@ -289,7 +309,6 @@ namespace LibGit2Sharp
                     ObjectId oid;
                     string symbolic;
 
-                    // REVIEW: should .Lookup method throw or return false on not found...
                     if (refdbBackend.Lookup(refName, out isSymbolic, out oid, out symbolic))
                     {
                         referencePtr = AllocNativeRef(refName, isSymbolic, oid, symbolic);
@@ -351,15 +370,13 @@ namespace LibGit2Sharp
                 {
                     RefdbBackend refdbBackend = MarshalRefdbBackend(backend);
 
-                var referenceHandle = new ReferenceHandle(referencePtr, false);
-                string name = Proxy.git_reference_name(referenceHandle);
-                GitReferenceType type = Proxy.git_reference_type(referenceHandle);
+                    var referenceHandle = new ReferenceHandle(referencePtr, false);
+                    string name = Proxy.git_reference_name(referenceHandle);
+                    GitReferenceType type = Proxy.git_reference_type(referenceHandle);
 
-                    // TODO: Marshal this correctly
                     if (oidPtr != IntPtr.Zero)
                     {
-                        GitOid oid = new GitOid();
-                        Marshal.Copy(oidPtr, oid.Id, 0, 20);
+                        GitOid oid = GitOid.BuildFromPtr(oidPtr);
                     }
 
                     string message = LaxUtf8Marshaler.FromNative(messagePtr);
@@ -582,7 +599,7 @@ namespace LibGit2Sharp
             public static GitErrorCode UnlockRef(
                 IntPtr backend, // git_refdb_backend
                 IntPtr payload,
-                [MarshalAs(UnmanagedType.Bool)] bool force,
+                IntPtr force,
                 [MarshalAs(UnmanagedType.Bool)] bool update_reflog,
                 IntPtr referencePtr, // const git_reference *
                 IntPtr who, // const git_signature *
@@ -595,11 +612,40 @@ namespace LibGit2Sharp
                 {
                     RefdbBackend refdbBackend = MarshalRefdbBackend(backend);
 
-                    var referenceHandle = new NotOwnedReferenceSafeHandle(referencePtr);
+                    var referenceHandle = new ReferenceHandle(referencePtr, false);
                     string refName = Proxy.git_reference_name(referenceHandle);
                     GitReferenceType type = Proxy.git_reference_type(referenceHandle);
+                    var unlockType = (RefdbBackendUnlockType)force.ToInt32();
 
-                    refdbBackend.UnlockReference(refName);
+                    switch (unlockType)
+                    {
+                        case RefdbBackendUnlockType.Unforced:
+                            refdbBackend.UnlockReference(refName);
+                            break;
+                        case RefdbBackendUnlockType.Forced:
+
+                            switch (type)
+                            {
+                                case GitReferenceType.Oid:
+                                    var target = Proxy.git_reference_target(referenceHandle);
+                                    refdbBackend.WriteDirectReference(refName, target, true);
+                                    break;
+                                case GitReferenceType.Symbolic:
+                                    var targetId = Proxy.git_reference_symbolic_target(referenceHandle);
+                                    refdbBackend.WriteSymbolicReference(refName, targetId, true);
+                                    break;
+                                default:
+                                    throw new LibGit2SharpException(string.Format("Unable to unlock reference from type '{0}'", type));
+                            }
+
+                            refdbBackend.UnlockReference(refName);
+                            break;
+                        case RefdbBackendUnlockType.UnlockAndDelete:
+                            refdbBackend.Delete(refName);
+                            break;
+                        default:
+                            throw new LibGit2SharpException(string.Format("Unknown unlock state '{0}'", unlockType));
+                    }
 
                     res = GitErrorCode.Ok;
                 }

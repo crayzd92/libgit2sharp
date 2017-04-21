@@ -1,8 +1,4 @@
 ﻿using LibGit2Sharp.Tests.TestHelpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace LibGit2Sharp.Tests
@@ -24,8 +20,6 @@ namespace LibGit2Sharp.Tests
             }
         }
 
-        #region Shared transaction tests
-
         [Fact]
         public void ReferenceIsNotRemovedWhenTransactionIsNotCommited()
         {
@@ -44,13 +38,13 @@ namespace LibGit2Sharp.Tests
             }
         }
 
-        [Fact]
+        [SkippableFact(Skip = "Unsure of intended behavior")]
         public void ReferenceIsNotModifiedWhenTransactionIsNotCommitted()
         {
 
         }
 
-        [Fact]
+        [SkippableFact(Skip = "Unsure of intended behavior")]
         public void CanUpdateReferenceAfterTransactionIsAbandonded()
         {
 
@@ -144,9 +138,7 @@ namespace LibGit2Sharp.Tests
 
                 using (var tx = repo.Refs.NewRefTransaction())
                 {
-                    // Should this throw (reference no longer exists...)
-                    Assert.Throws<LibGit2SharpException>(
-                        () => tx.LockReference(myRef));
+                    Assert.Throws<NotFoundException>(() => tx.LockReference(myRef));
                 }
             }
         }
@@ -165,11 +157,9 @@ namespace LibGit2Sharp.Tests
                 using (var tx2 = repo.Refs.NewRefTransaction())
                 {
                     tx.LockReference(myRef);
-                    Assert.Throws<LibGit2SharpException>(() => tx2.LockReference(myRef));
+                    Assert.Throws<LockedFileException>(() => tx2.LockReference(myRef));
                 }
             }
         }
-
-        #endregion
     }
 }
