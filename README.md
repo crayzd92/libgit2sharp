@@ -1,19 +1,20 @@
 # LibGit2Sharp
 
-[![master azurepipelines][master-azurepipelines-badge]][master-azurepipelines]
-[![master win][master-win-badge]][master-win]
-[![master nix][master-nix-badge]][master-nix]
-[![coverity][coverity-badge]][coverity-project]
+[![No Maintenance Intended][no-maint-badge]][no-maint-tech]
 
-[master-azurepipelines-badge]: https://dev.azure.com/libgit2sharp/libgit2sharp/_apis/build/status/libgit2sharp?branchName=master
-[master-azurepipelines]: https://dev.azure.com/libgit2sharp/libgit2sharp/_build/latest?definitionId=1
-[master-win-badge]: https://ci.appveyor.com/api/projects/status/8qxcoqdo9kp7x2w9/branch/master?svg=true
-[master-win]: https://ci.appveyor.com/project/libgit2/libgit2sharp/branch/master
-[master-nix-badge]: https://travis-ci.org/libgit2/libgit2sharp.svg?branch=master
-[master-nix]: https://travis-ci.org/libgit2/libgit2sharp/branches
+[no-maint-badge]: http://unmaintained.tech/badge.svg
+[no-maint-tech]: http://unmaintained.tech/
 
-[coverity-project]: https://scan.coverity.com/projects/2088
-[coverity-badge]: https://scan.coverity.com/projects/2088/badge.svg
+**THIS REPOSITORY IS NOT ACTIVELY MAINTAINED**
+
+ - Updated to [0.26.2] of the original library
+ - Forked from [Zoxive/libgit2sharp][zoxive-libgit2sharp]
+ - Includes refdb implemenation for use with database-based git systems
+ - Original library [libgit2sharp/libgit2sharp][og-libgit2sharp]
+
+[0.26.2]: https://github.com/libgit2/libgit2sharp/releases/tag/v0.26.2
+[zoxive-libgit2sharp]: https://github.com/zoxive/libgit2sharp
+[og-libgit2sharp]: https://github.com/libgit2sharp/libgit2sharp
 
 **LibGit2Sharp brings all the might and speed of [libgit2][libgit2], a native Git implementation, to the managed world of .NET and Mono.**
 
@@ -21,7 +22,7 @@
 
 ## Prerequisites
 
- - **Windows:** .NET 4.6.1+
+ - **Windows:** .NET 4.8.1+, .NET Standard 2.1+
  - **Linux/Mac OS X:** Mono 5.4+
 
 ## Online resources
