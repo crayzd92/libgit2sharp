@@ -35,6 +35,7 @@ namespace LibGit2Sharp
         private readonly Stack<IDisposable> toCleanup = new Stack<IDisposable>();
         private readonly Ignore ignore;
         private readonly SubmoduleCollection submodules;
+        private readonly WorktreeCollection worktrees;
         private readonly Lazy<PathCase> pathCase;
 
         [Flags]
@@ -91,7 +92,56 @@ namespace LibGit2Sharp
             this(path, options, RepositoryRequiredParameter.Path | RepositoryRequiredParameter.Options)
         {
         }
-        
+
+        internal Repository(WorktreeHandle worktreeHandle)
+        {
+            try
+            {
+                handle = Proxy.git_repository_open_from_worktree(worktreeHandle);
+                RegisterForCleanup(handle);
+                RegisterForCleanup(worktreeHandle);
+
+                isBare = Proxy.git_repository_is_bare(handle);
+
+                Func<Index> indexBuilder = () => new Index(this);
+
+                string configurationGlobalFilePath = null;
+                string configurationXDGFilePath = null;
+                string configurationSystemFilePath = null;
+
+                if (!isBare)
+                {
+                    index = new Lazy<Index>(() => indexBuilder());
+                }
+
+                commits = new CommitLog(this);
+                refs = new ReferenceCollection(this);
+                branches = new BranchCollection(this);
+                tags = new TagCollection(this);
+                stashes = new StashCollection(this);
+                info = new Lazy<RepositoryInformation>(() => new RepositoryInformation(this, isBare));
+                config = new Lazy<Configuration>(() => RegisterForCleanup(new Configuration(this,
+                                                                                            null,
+                                                                                            configurationGlobalFilePath,
+                                                                                            configurationXDGFilePath,
+                                                                                            configurationSystemFilePath)));
+                odb = new Lazy<ObjectDatabase>(() => new ObjectDatabase(this, false));
+                diff = new Diff(this);
+                notes = new NoteCollection(this);
+                ignore = new Ignore(this);
+                network = new Lazy<Network>(() => new Network(this));
+                rebaseOperation = new Lazy<Rebase>(() => new Rebase(this));
+                pathCase = new Lazy<PathCase>(() => new PathCase(this));
+                submodules = new SubmoduleCollection(this);
+                worktrees = new WorktreeCollection(this);
+            }
+            catch
+            {
+                CleanupDisposableDependencies();
+                throw;
+            }
+        }
+
         private Repository(string path, RepositoryOptions options, RepositoryRequiredParameter requiredParameter)
         {
             if ((requiredParameter & RepositoryRequiredParameter.Path) == RepositoryRequiredParameter.Path)
@@ -182,6 +232,7 @@ namespace LibGit2Sharp
                 rebaseOperation = new Lazy<Rebase>(() => new Rebase(this));
                 pathCase = new Lazy<PathCase>(() => new PathCase(this));
                 submodules = new SubmoduleCollection(this);
+                worktrees = new WorktreeCollection(this);
 
                 EagerlyLoadComponentsWithSpecifiedPaths(options);
             }
@@ -396,6 +447,14 @@ namespace LibGit2Sharp
         public SubmoduleCollection Submodules
         {
             get { return submodules; }
+        }
+
+        /// <summary>
+        /// Worktrees in the repository.
+        /// </summary>
+        public WorktreeCollection Worktrees
+        {
+            get { return worktrees; }
         }
 
         #region IDisposable Members
@@ -705,21 +764,26 @@ namespace LibGit2Sharp
                 throw new UserCancelledException("Clone cancelled by the user.");
             }
 
-            using (GitCheckoutOptsWrapper checkoutOptionsWrapper = new GitCheckoutOptsWrapper(options))
+            using (var checkoutOptionsWrapper = new GitCheckoutOptsWrapper(options))
+            using (var fetchOptionsWrapper = new GitFetchOptionsWrapper())
             {
                 var gitCheckoutOptions = checkoutOptionsWrapper.Options;
 
-                var remoteCallbacks = new RemoteCallbacks(options);
-                var gitRemoteCallbacks = remoteCallbacks.GenerateCallbacks();
-
-                var gitProxyOptions = new GitProxyOptions { Version = 1 };
+                var gitFetchOptions = fetchOptionsWrapper.Options;
+                gitFetchOptions.ProxyOptions = new GitProxyOptions { Version = 1 };
+                gitFetchOptions.RemoteCallbacks = new RemoteCallbacks(options).GenerateCallbacks();
+                if (options.FetchOptions != null && options.FetchOptions.CustomHeaders != null)
+                {
+                    gitFetchOptions.CustomHeaders =
+                        GitStrArrayManaged.BuildFrom(options.FetchOptions.CustomHeaders);
+                }
 
                 var cloneOpts = new GitCloneOptions
                 {
                     Version = 1,
                     Bare = options.IsBare ? 1 : 0,
                     CheckoutOpts = gitCheckoutOptions,
-                    FetchOpts = new GitFetchOptions { ProxyOptions = gitProxyOptions, RemoteCallbacks = gitRemoteCallbacks },
+                    FetchOpts = gitFetchOptions,
                 };
 
                 string clonedRepoPath;

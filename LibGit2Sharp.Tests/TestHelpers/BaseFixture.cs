@@ -43,6 +43,8 @@ namespace LibGit2Sharp.Tests.TestHelpers
         private static string SubmoduleTargetTestRepoWorkingDirPath { get; set; }
         private static string AssumeUnchangedRepoWorkingDirPath { get; set; }
         public static string SubmoduleSmallTestRepoWorkingDirPath { get; set; }
+        public static string WorktreeTestRepoWorkingDirPath { get; private set; }
+        public static string WorktreeTestRepoWorktreesDirPath { get; private set; }
         public static string PackBuilderTestRepoPath { get; private set; }
 
         public static DirectoryInfo ResourcesDirectory { get; private set; }
@@ -51,33 +53,39 @@ namespace LibGit2Sharp.Tests.TestHelpers
 
         protected static DateTimeOffset TruncateSubSeconds(DateTimeOffset dto)
         {
-            int seconds = dto.ToSecondsSinceEpoch();
-            return Epoch.ToDateTimeOffset(seconds, (int)dto.Offset.TotalMinutes);
+            var seconds = dto.ToUnixTimeSeconds();
+            return DateTimeOffset.FromUnixTimeSeconds(seconds).ToOffset(dto.Offset);
         }
 
         private static void SetUpTestEnvironment()
         {
             IsFileSystemCaseSensitive = IsFileSystemCaseSensitiveInternal();
 
-            string initialAssemblyParentFolder = Directory.GetParent(new Uri(typeof(BaseFixture).GetTypeInfo().Assembly.CodeBase).LocalPath).FullName;
+            var resourcesPath = Environment.GetEnvironmentVariable("LIBGIT2SHARP_RESOURCES");
 
-            const string sourceRelativePath = @"../../../../LibGit2Sharp.Tests/Resources";
-            ResourcesDirectory = new DirectoryInfo(Path.Combine(initialAssemblyParentFolder, sourceRelativePath));
+            if (resourcesPath == null)
+            {
+                resourcesPath = Path.Combine(Directory.GetParent(new Uri(typeof(BaseFixture).GetTypeInfo().Assembly.CodeBase).LocalPath).FullName, "Resources");
+            }
+
+            ResourcesDirectory = new DirectoryInfo(resourcesPath);
 
             // Setup standard paths to our test repositories
-            BareTestRepoPath = Path.Combine(sourceRelativePath, "testrepo.git");
-            StandardTestRepoWorkingDirPath = Path.Combine(sourceRelativePath, "testrepo_wd");
+            BareTestRepoPath = Path.Combine(ResourcesDirectory.FullName, "testrepo.git");
+            StandardTestRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "testrepo_wd");
             StandardTestRepoPath = Path.Combine(StandardTestRepoWorkingDirPath, "dot_git");
-            ShallowTestRepoPath = Path.Combine(sourceRelativePath, "shallow.git");
-            MergedTestRepoWorkingDirPath = Path.Combine(sourceRelativePath, "mergedrepo_wd");
-            MergeRenamesTestRepoWorkingDirPath = Path.Combine(sourceRelativePath, "mergerenames_wd");
-            MergeTestRepoWorkingDirPath = Path.Combine(sourceRelativePath, "merge_testrepo_wd");
-            RevertTestRepoWorkingDirPath = Path.Combine(sourceRelativePath, "revert_testrepo_wd");
-            SubmoduleTestRepoWorkingDirPath = Path.Combine(sourceRelativePath, "submodule_wd");
-            SubmoduleTargetTestRepoWorkingDirPath = Path.Combine(sourceRelativePath, "submodule_target_wd");
-            AssumeUnchangedRepoWorkingDirPath = Path.Combine(sourceRelativePath, "assume_unchanged_wd");
-            SubmoduleSmallTestRepoWorkingDirPath = Path.Combine(sourceRelativePath, "submodule_small_wd");
-            PackBuilderTestRepoPath = Path.Combine(sourceRelativePath, "packbuilder_testrepo_wd");
+            ShallowTestRepoPath = Path.Combine(ResourcesDirectory.FullName, "shallow.git");
+            MergedTestRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "mergedrepo_wd");
+            MergeRenamesTestRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "mergerenames_wd");
+            MergeTestRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "merge_testrepo_wd");
+            RevertTestRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "revert_testrepo_wd");
+            SubmoduleTestRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "submodule_wd");
+            SubmoduleTargetTestRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "submodule_target_wd");
+            AssumeUnchangedRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "assume_unchanged_wd");
+            SubmoduleSmallTestRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "submodule_small_wd");
+            PackBuilderTestRepoPath = Path.Combine(ResourcesDirectory.FullName, "packbuilder_testrepo_wd");
+            WorktreeTestRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "worktree", "testrepo_wd");
+            WorktreeTestRepoWorktreesDirPath = Path.Combine(ResourcesDirectory.FullName, "worktree", "worktrees");
 
             CleanupTestReposOlderThan(TimeSpan.FromMinutes(15));
         }
@@ -211,6 +219,11 @@ namespace LibGit2Sharp.Tests.TestHelpers
             Directory.CreateDirectory(Path.Combine(path, "submodule_target_wd"));
 
             return path;
+        }
+
+        public string SandboxWorktreeTestRepo()
+        {
+            return Sandbox(WorktreeTestRepoWorkingDirPath, WorktreeTestRepoWorktreesDirPath);
         }
 
         protected string SandboxPackBuilderTestRepo()

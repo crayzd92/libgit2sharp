@@ -1,10 +1,12 @@
 # LibGit2Sharp
 
+[![master azurepipelines][master-azurepipelines-badge]][master-azurepipelines]
 [![master win][master-win-badge]][master-win]
 [![master nix][master-nix-badge]][master-nix]
 [![coverity][coverity-badge]][coverity-project]
-[![coveralls][coveralls-badge]][coveralls-project]
 
+[master-azurepipelines-badge]: https://dev.azure.com/libgit2sharp/libgit2sharp/_apis/build/status/libgit2sharp?branchName=master
+[master-azurepipelines]: https://dev.azure.com/libgit2sharp/libgit2sharp/_build/latest?definitionId=1
 [master-win-badge]: https://ci.appveyor.com/api/projects/status/8qxcoqdo9kp7x2w9/branch/master?svg=true
 [master-win]: https://ci.appveyor.com/project/libgit2/libgit2sharp/branch/master
 [master-nix-badge]: https://travis-ci.org/libgit2/libgit2sharp.svg?branch=master
@@ -13,17 +15,14 @@
 [coverity-project]: https://scan.coverity.com/projects/2088
 [coverity-badge]: https://scan.coverity.com/projects/2088/badge.svg
 
-[coveralls-project]: https://coveralls.io/r/libgit2/libgit2sharp?branch=master
-[coveralls-badge]: https://coveralls.io/repos/libgit2/libgit2sharp/badge.svg?branch=master
-
 **LibGit2Sharp brings all the might and speed of [libgit2][libgit2], a native Git implementation, to the managed world of .NET and Mono.**
 
  [libgit2]: http://libgit2.github.com/
 
 ## Prerequisites
 
- - **Windows:** .NET 4.0+
- - **Linux/Mac OS X:** Mono 3.6+
+ - **Windows:** .NET 4.6.1+
+ - **Linux/Mac OS X:** Mono 5.4+
 
 ## Online resources
 

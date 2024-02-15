@@ -262,7 +262,7 @@ namespace LibGit2Sharp
 
                 if (handle == null)
                 {
-                    Proxy.giterr_set_str(GitErrorCategory.Reference, "Cannot retrieve the RefdbBackend handle.");
+                    Proxy.git_error_set_str(GitErrorCategory.Reference, "Cannot retrieve the RefdbBackend handle.");
                     return false;
                 }
 
@@ -272,7 +272,7 @@ namespace LibGit2Sharp
 
             private static int ErrorMarshalingRefDbBacked()
             {
-                Proxy.giterr_set_str(GitErrorCategory.Reference, "Cannot retrieve the RefdbBackend handle.");
+                Proxy.git_error_set_str(GitErrorCategory.Reference, "Cannot retrieve the RefdbBackend handle.");
                 return (int)GitErrorCode.Error;
             }
 
@@ -296,7 +296,7 @@ namespace LibGit2Sharp
                 {
                     exists = false;
 
-                    Proxy.giterr_set_str(GitErrorCategory.Reference, ex);
+                    Proxy.git_error_set_str(GitErrorCategory.Reference, ex);
                     res = GitErrorCode.Error;
                 }
 
@@ -332,7 +332,7 @@ namespace LibGit2Sharp
                 }
                 catch (Exception ex)
                 {
-                    Proxy.giterr_set_str(GitErrorCategory.Reference, ex);
+                    Proxy.git_error_set_str(GitErrorCategory.Reference, ex);
                     res = GitErrorCode.Error;
                 }
 
@@ -359,7 +359,7 @@ namespace LibGit2Sharp
                 }
                 catch (Exception ex)
                 {
-                    Proxy.giterr_set_str(GitErrorCategory.Reference, ex);
+                    Proxy.git_error_set_str(GitErrorCategory.Reference, ex);
                     res = GitErrorCode.Error;
                 }
 
@@ -415,12 +415,12 @@ namespace LibGit2Sharp
                 }
                 catch (NameConflictException ex)
                 {
-                    Proxy.giterr_set_str(GitErrorCategory.Reference, ex);
+                    Proxy.git_error_set_str(GitErrorCategory.Reference, ex);
                     res = GitErrorCode.Exists;
                 }
                 catch (Exception ex)
                 {
-                    Proxy.giterr_set_str(GitErrorCategory.Reference, ex);
+                    Proxy.git_error_set_str(GitErrorCategory.Reference, ex);
                     res = GitErrorCode.Error;
                 }
 
@@ -459,13 +459,13 @@ namespace LibGit2Sharp
                 catch (NameConflictException ex)
                 {
                     reference = IntPtr.Zero;
-                    Proxy.giterr_set_str(GitErrorCategory.Reference, ex);
+                    Proxy.git_error_set_str(GitErrorCategory.Reference, ex);
                     res = GitErrorCode.Exists;
                 }
                 catch (Exception ex)
                 {
                     reference = IntPtr.Zero;
-                    Proxy.giterr_set_str(GitErrorCategory.Reference, ex);
+                    Proxy.git_error_set_str(GitErrorCategory.Reference, ex);
                     res = GitErrorCode.Error;
                 }
 
@@ -491,7 +491,7 @@ namespace LibGit2Sharp
                 }
                 catch (Exception ex)
                 {
-                    Proxy.giterr_set_str(GitErrorCategory.Reference, ex);
+                    Proxy.git_error_set_str(GitErrorCategory.Reference, ex);
                     res = GitErrorCode.Error;
                 }
 
@@ -511,7 +511,7 @@ namespace LibGit2Sharp
                 }
                 catch (Exception ex)
                 {
-                    Proxy.giterr_set_str(GitErrorCategory.Reference, ex);
+                    Proxy.git_error_set_str(GitErrorCategory.Reference, ex);
                     res = GitErrorCode.Error;
                 }
 
@@ -532,7 +532,7 @@ namespace LibGit2Sharp
             private static GitErrorCode ReflogRead(out IntPtr reflogPtr, IntPtr backendPtr, IntPtr refNamePtr)
             {
                 reflogPtr = IntPtr.Zero;
-                Proxy.giterr_set_str(GitErrorCategory.Reference, "Not implemented");
+                Proxy.git_error_set_str(GitErrorCategory.Reference, "Not implemented");
                 return GitErrorCode.Error;
             }
 
@@ -541,7 +541,7 @@ namespace LibGit2Sharp
                 IntPtr git_reflog // git_reflog *
                 )
             {
-                Proxy.giterr_set_str(GitErrorCategory.Reference, "Not implemented");
+                Proxy.git_error_set_str(GitErrorCategory.Reference, "Not implemented");
                 return GitErrorCode.Error;
             }
 
@@ -551,7 +551,7 @@ namespace LibGit2Sharp
                 IntPtr newNamePtr // const char *
                 )
             {
-                Proxy.giterr_set_str(GitErrorCategory.Reference, "Not implemented");
+                Proxy.git_error_set_str(GitErrorCategory.Reference, "Not implemented");
                 return GitErrorCode.Error;
             }
 
@@ -560,7 +560,7 @@ namespace LibGit2Sharp
                 IntPtr namePtr // const char *
                 )
             {
-                Proxy.giterr_set_str(GitErrorCategory.Reference, "Not implemented");
+                Proxy.git_error_set_str(GitErrorCategory.Reference, "Not implemented");
                 return GitErrorCode.Error;
             }
 
@@ -569,7 +569,7 @@ namespace LibGit2Sharp
                 IntPtr refNamePtr // const char *
                 )
             {
-                Proxy.giterr_set_str(GitErrorCategory.Reference, "Not implemented");
+                Proxy.git_error_set_str(GitErrorCategory.Reference, "Not implemented");
                 return GitErrorCode.Error;
             }
 
@@ -578,7 +578,7 @@ namespace LibGit2Sharp
                 IntPtr refNamePtr // const char *
                 )
             {
-                Proxy.giterr_set_str(GitErrorCategory.Reference, "Not implemented");
+                Proxy.git_error_set_str(GitErrorCategory.Reference, "Not implemented");
                 return GitErrorCode.Error;
             }
 
@@ -600,7 +600,7 @@ namespace LibGit2Sharp
                 }
                 catch (Exception ex)
                 {
-                    Proxy.giterr_set_str(GitErrorCategory.Reference, ex);
+                    Proxy.git_error_set_str(GitErrorCategory.Reference, ex);
                     res = GitErrorCode.Error;
                 }
 
@@ -662,7 +662,7 @@ namespace LibGit2Sharp
                 }
                 catch (Exception ex)
                 {
-                    Proxy.giterr_set_str(GitErrorCategory.Reference, ex);
+                    Proxy.git_error_set_str(GitErrorCategory.Reference, ex);
                     res = GitErrorCode.Error;
                 }
 

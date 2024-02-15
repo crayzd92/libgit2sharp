@@ -601,4 +601,27 @@ namespace LibGit2Sharp.Core.Handles
             return (git_transaction*) handle.Handle;
         }
     }
+
+    internal unsafe class WorktreeHandle : Libgit2Object
+    {
+        internal WorktreeHandle(git_worktree *ptr, bool owned)
+            : base((void *) ptr, owned)
+        {
+        }
+
+        internal WorktreeHandle(IntPtr ptr, bool owned)
+            : base(ptr, owned)
+        {
+        }
+
+        public override void Free()
+        {
+            NativeMethods.git_worktree_free((git_worktree*) ptr);
+        }
+
+        public static implicit operator git_worktree*(WorktreeHandle handle)
+        {
+            return (git_worktree*) handle.Handle;
+        }
+    }
 }

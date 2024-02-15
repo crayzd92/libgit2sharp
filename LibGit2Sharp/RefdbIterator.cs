@@ -95,7 +95,7 @@ namespace LibGit2Sharp
 
                 if (handle == null)
                 {
-                    Proxy.giterr_set_str(GitErrorCategory.Reference, "Cannot retrieve the RefDbIter handle.");
+                    Proxy.git_error_set_str(GitErrorCategory.Reference, "Cannot retrieve the RefDbIter handle.");
                     return false;
                 }
 
