@@ -12,7 +12,7 @@
  - Includes refdb implemenation for use with database-based git systems
  - Original library [libgit2sharp/libgit2sharp][og-libgit2sharp]
 
-[0.30.0]: https://github.com/libgit2/libgit2sharp/releases/tag/v0.30.0
+[0.30.0]: https://github.com/libgit2/libgit2sharp/releases/tag/0.30.0
 [zoxive-libgit2sharp]: https://github.com/zoxive/libgit2sharp
 [og-libgit2sharp]: https://github.com/libgit2sharp/libgit2sharp
 
