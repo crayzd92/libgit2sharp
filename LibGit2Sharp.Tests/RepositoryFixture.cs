@@ -212,13 +212,13 @@ namespace LibGit2Sharp.Tests
                 }
 
                 // Perform the actual fetch
-                Commands.Fetch(repo, remoteName, new string[0], new FetchOptions { OnUpdateTips = expectedFetchState.RemoteUpdateTipsHandler }, null);
+                Commands.Fetch(repo, remoteName, Array.Empty<string>(), new FetchOptions { OnUpdateTips = expectedFetchState.RemoteUpdateTipsHandler }, null);
 
                 // Verify the expected state
                 expectedFetchState.CheckUpdatedReferences(repo);
 
                 // Now fetch the rest of the tags
-                Commands.Fetch(repo, remoteName, new string[0], new FetchOptions { TagFetchMode = TagFetchMode.All }, null);
+                Commands.Fetch(repo, remoteName, Array.Empty<string>(), new FetchOptions { TagFetchMode = TagFetchMode.All }, null);
 
                 // Verify that the "nearly-dangling" tag is now in the repo.
                 Tag nearlyDanglingTag = repo.Tags["nearly-dangling"];
@@ -710,7 +710,6 @@ namespace LibGit2Sharp.Tests
         [Theory]
         [InlineData("http://github.com/libgit2/TestGitRepository")]
         [InlineData("https://github.com/libgit2/TestGitRepository")]
-        [InlineData("git://github.com/libgit2/TestGitRepository.git")]
         public void CanListRemoteReferences(string url)
         {
             IEnumerable<Reference> references = Repository.ListRemoteReferences(url).ToList();

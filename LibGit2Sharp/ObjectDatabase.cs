@@ -114,8 +114,8 @@ namespace LibGit2Sharp
             }
 
             ObjectId id = Path.IsPathRooted(path)
-                ? Proxy.git_blob_create_fromdisk(repo.Handle, path)
-                : Proxy.git_blob_create_fromfile(repo.Handle, path);
+                ? Proxy.git_blob_create_from_disk(repo.Handle, path)
+                : Proxy.git_blob_create_from_workdir(repo.Handle, path);
 
             return repo.Lookup<Blob>(id);
         }
@@ -209,7 +209,7 @@ namespace LibGit2Sharp
 
             if (!stream.CanRead)
             {
-                throw new ArgumentException("The stream cannot be read from.", "stream");
+                throw new ArgumentException("The stream cannot be read from.", nameof(stream));
             }
 
             using (var odbStream = Proxy.git_odb_open_wstream(handle, numberOfBytesToConsume, GitObjectType.Blob))
@@ -284,10 +284,10 @@ namespace LibGit2Sharp
 
             if (!stream.CanRead)
             {
-                throw new ArgumentException("The stream cannot be read from.", "stream");
+                throw new ArgumentException("The stream cannot be read from.", nameof(stream));
             }
 
-            IntPtr writestream_ptr = Proxy.git_blob_create_fromstream(repo.Handle, hintpath);
+            IntPtr writestream_ptr = Proxy.git_blob_create_from_stream(repo.Handle, hintpath);
             GitWriteStream writestream = Marshal.PtrToStructure<GitWriteStream>(writestream_ptr);
 
             try
@@ -325,10 +325,10 @@ namespace LibGit2Sharp
                     throw new EndOfStreamException("The stream ended unexpectedly");
                 }
             }
-            catch(Exception e)
+            catch (Exception)
             {
                 writestream.free(writestream_ptr);
-                throw e;
+                throw;
             }
 
             ObjectId id = Proxy.git_blob_create_fromstream_commit(writestream_ptr);
@@ -598,7 +598,7 @@ namespace LibGit2Sharp
                 // Stopped due to FailOnConflict so there's no index or conflict list
                 if (earlyStop)
                 {
-                    return new MergeTreeResult(new Conflict[] { });
+                    return new MergeTreeResult(Array.Empty<Conflict>());
                 }
 
                 if (Proxy.git_index_has_conflicts(indexHandle))
@@ -649,7 +649,7 @@ namespace LibGit2Sharp
 
             if (minLength <= 0 || minLength > ObjectId.HexSize)
             {
-                throw new ArgumentOutOfRangeException("minLength",
+                throw new ArgumentOutOfRangeException(nameof(minLength),
                                                       minLength,
                                                       string.Format("Expected value should be greater than zero and less than or equal to {0}.",
                                                                     ObjectId.HexSize));
@@ -724,7 +724,7 @@ namespace LibGit2Sharp
             {
                 if (commit == null)
                 {
-                    throw new ArgumentException("Enumerable contains null at position: " + count.ToString(CultureInfo.InvariantCulture), "commits");
+                    throw new ArgumentException("Enumerable contains null at position: " + count.ToString(CultureInfo.InvariantCulture), nameof(commits));
                 }
                 ids.Add(commit.Id.Oid);
                 count++;
@@ -732,7 +732,7 @@ namespace LibGit2Sharp
 
             if (count < 2)
             {
-                throw new ArgumentException("The enumerable must contains at least two commits.", "commits");
+                throw new ArgumentException("The enumerable must contains at least two commits.", nameof(commits));
             }
 
             switch (strategy)
@@ -746,7 +746,7 @@ namespace LibGit2Sharp
                     break;
 
                 default:
-                    throw new ArgumentException("", "strategy");
+                    throw new ArgumentException("", nameof(strategy));
             }
 
             return id == null ? null : repo.Lookup<Commit>(id);
@@ -790,7 +790,7 @@ namespace LibGit2Sharp
                 // Stopped due to FailOnConflict so there's no index or conflict list
                 if (earlyStop)
                 {
-                    return new MergeTreeResult(new Conflict[] { });
+                    return new MergeTreeResult(Array.Empty<Conflict>());
                 }
 
                 if (Proxy.git_index_has_conflicts(indexHandle))
@@ -1073,7 +1073,7 @@ namespace LibGit2Sharp
                 // Stopped due to FailOnConflict so there's no index or conflict list
                 if (earlyStop)
                 {
-                    return new MergeTreeResult(new Conflict[] { });
+                    return new MergeTreeResult(Array.Empty<Conflict>());
                 }
 
                 if (Proxy.git_index_has_conflicts(indexHandle))

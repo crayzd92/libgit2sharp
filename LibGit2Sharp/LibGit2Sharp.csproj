@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;net481</TargetFrameworks>
+    <TargetFrameworks>net472;net6.0</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Description>LibGit2Sharp brings all the might and speed of libgit2, a native Git implementation, to the managed world of .Net and Mono.</Description>
+    <Description>LibGit2Sharp brings all the might and speed of libgit2, a native Git implementation, to the managed world of .NET</Description>
     <Company>LibGit2Sharp contributors</Company>
     <Copyright>Copyright © LibGit2Sharp contributors</Copyright>
     <PackageTags>libgit2 git</PackageTags>
@@ -11,47 +12,50 @@
     <Authors>LibGit2Sharp contributors</Authors>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <DebugType>embedded</DebugType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\libgit2sharp.snk</AssemblyOriginatorKeyFile>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>Updated to 0.26.2
-Updated nuget packages</PackageReleaseNotes>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <PackageIcon>square-logo.png</PackageIcon>
+    <PackageReadmeFile>App_Readme/README.md</PackageReadmeFile>
+    <PackageLicenseFile>App_Readme/LICENSE.md</PackageLicenseFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageOutputPath>$(ArtifactsPath)\package</PackageOutputPath>
+    <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
+    <MinVerBuildMetadata Condition="'$(libgit2_hash)' != ''">libgit2-$(libgit2_hash.Substring(0,7))</MinVerBuildMetadata>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 
   <ItemGroup>
-    <CodeAnalysisDictionary Include="CustomDictionary.xml" />
-    <None Include="..\square-logo.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="Core\Handles\Objects.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Objects.cs</LastGenOutput>
-    </None>
-    <None Include="..\README.md" Pack="true" PackagePath="\" />
-    <None Include="..\LICENSE.md" Pack="true" PackagePath="App_Readme\" />
-    <None Include="..\CHANGES.md" Pack="true" PackagePath="App_Readme\" />
-    <Compile Update="Core\Handles\Objects.cs" DependentUpon="Objects.tt" />
+    <None Include="..\square-logo.png" Pack="true" PackagePath="" Visible="false" />
+    <None Include="..\README.md" Pack="true" PackagePath="App_Readme/" Visible="false" />
+    <None Include="..\LICENSE.md" Pack="true" PackagePath="App_Readme/" Visible="false" />
+    <None Include="..\CHANGES.md" Pack="true" PackagePath="App_Readme/" Visible="false" />
+    <None Update="Core\Handles\Objects.tt" Generator="TextTemplatingFileGenerator" LastGenOutput="Objects.cs" />
+    <Compile Update="Core\Handles\Objects.cs" DependentUpon="Objects.tt" DesignTime="True" AutoGen="True" />
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" /> <!-- Needed for T4 generation -->
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="[2.0.306]" PrivateAssets="none" />
+    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="[2.0.322]" PrivateAssets="none" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.6.133" PrivateAssets="all" />
-    <DotNetCliToolReference Include="dotnet-sourcelink-git" Version="2.8.0" />
+    <PackageReference Include="MinVer" Version="5.0.0" PrivateAssets="all" />
   </ItemGroup>
 
   <Import Project="..\Targets\CodeGenerator.targets" />
   <Import Project="..\Targets\GenerateNativeDllName.targets" />
 
-  <Target Name="SetNuSpecProperties" BeforeTargets="GenerateNuspec" DependsOnTargets="GetBuildVersion">
+  <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
-      <PackageIconUrl>https://github.com/crayzd92/libgit2sharp/raw/$(GitCommitIdShort)/square-logo.png</PackageIconUrl>
-      <PackageReleaseNotes>https://github.com/crayzd92/libgit2sharp/blob/$(GitCommitIdShort)/CHANGES.md#libgit2sharp-changes</PackageReleaseNotes>
-      <PackageLicenseUrl>https://github.com/crayzd92/libgit2sharp/raw/$(GitCommitIdShort)/LICENSE.md</PackageLicenseUrl>
+      <PackageReleaseNotes>https://github.com/libgit2/libgit2sharp/blob/$(SourceRevisionId)/CHANGES.md</PackageReleaseNotes>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="AdjustVersions" AfterTargets="MinVer">
+    <PropertyGroup>
+      <AssemblyVersion>$(MinVerMajor).$(MinVerMinor).0.0</AssemblyVersion>
     </PropertyGroup>
   </Target>
 

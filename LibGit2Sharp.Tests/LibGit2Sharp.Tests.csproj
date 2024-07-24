@@ -1,39 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net481;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(TargetFrameworks)'==''">net472;net6.0;net8.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\LibGit2Sharp\LibGit2Sharp.csproj" />
-    <ProjectReference Include="..\NativeLibraryLoadTestApp\x86\NativeLibraryLoadTestApp.x86.csproj" Condition="'$(TargetFramework)' == 'net481'" ReferenceOutputAssembly="false" OutputItemType="TestAppExe" />
-    <ProjectReference Include="..\NativeLibraryLoadTestApp\x64\NativeLibraryLoadTestApp.x64.csproj" Condition="'$(TargetFramework)' == 'net481'" ReferenceOutputAssembly="false" OutputItemType="TestAppExe" />
+    <ProjectReference Include="..\NativeLibraryLoadTestApp\x86\NativeLibraryLoadTestApp.x86.csproj" Condition="'$(TargetFramework)' == 'net472'" ReferenceOutputAssembly="false" OutputItemType="TestAppExe" />
+    <ProjectReference Include="..\NativeLibraryLoadTestApp\x64\NativeLibraryLoadTestApp.x64.csproj" Condition="'$(TargetFramework)' == 'net472'" ReferenceOutputAssembly="false" OutputItemType="TestAppExe" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="Moq" Version="4.20.70" />
-    <PackageReference Include="xunit" Version="2.6.6" />
-    <PackageReference Include="xunit.runner.console" Version="2.6.6">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="xunit" Version="2.7.0" />
+    <PackageReference Include="xunit.runner.console" Version="2.7.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7" />
     <PackageReference Include="xunit.skippablefact" Version="1.4.13" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\LibGit2Sharp\Core\Platform.cs" Link="TestHelpers\Platform.cs" />
-    <Compile Remove="desktop\**" Condition=" '$(TargetFramework)' != 'net481' " />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Resources\**\*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Compile Remove="desktop\**" Condition="'$(TargetFramework)' != 'net472'" />
+    <Content Include="Resources\**\*.*" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <Target Name="CopyTestAppExes" AfterTargets="ResolveProjectReferences">
